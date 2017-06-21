@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+nodemon -e rs --ignore 'target/*' --exec cargo test "$@"
