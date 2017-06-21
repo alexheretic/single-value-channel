@@ -2,3 +2,7 @@
 name = "single_value_channel"
 version = "1.0.0"
 authors = ["Alex Butler <alexheretic@gmail.com>"]
+description = "Concurrent single-value update and receive channel "
+repository = "https://github.com/alexheretic/single-value-channel"
+keywords = ["concurrent", "channel"]
+license = "Apache-2.0"
