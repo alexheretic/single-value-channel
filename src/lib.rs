@@ -34,6 +34,7 @@ use std::sync::{Arc, Mutex, Weak};
 use std::result::Result;
 
 /// The receiving-half of the single value channel.
+#[derive(Debug)]
 pub struct Receiver<T> {
     latest: T,
     latest_set: Arc<Mutex<Option<T>>>
@@ -63,7 +64,7 @@ impl<T> Receiver<T> {
 
 
 /// The updating-half of the single value channel.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Updater<T> {
     latest: Weak<Mutex<Option<T>>>
 }
