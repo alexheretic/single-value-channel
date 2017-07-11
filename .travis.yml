@@ -1,0 +1,13 @@
+sudo: false
+language: rust
+cache:
+  cargo: true
+rust:
+  - stable
+  - nightly
+os:
+  - linux
+  - osx
+script:
+  - export RUST_BACKTRACE=full
+  - cargo test
