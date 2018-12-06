@@ -22,22 +22,23 @@
 //! let (mut receiver, updater) = channel_starting_with(0);
 //! assert_eq!(*receiver.latest(), 0);
 //!
-//! thread::spawn(move|| {
+//! thread::spawn(move || {
 //!     updater.update(2); // next access to receiver.latest() -> 2
 //!     updater.update(12); // next access to receiver.latest() -> 12
-//! }).join();
+//! })
+//! .join();
 //!
 //! assert_eq!(*receiver.latest(), 12);
 //! ```
 
-use std::sync::{Arc, Mutex, Weak};
 use std::result::Result;
+use std::sync::{Arc, Mutex, Weak};
 
 /// The receiving-half of the single value channel.
 #[derive(Debug)]
 pub struct Receiver<T> {
     latest: T,
-    latest_set: Arc<Mutex<Option<T>>>
+    latest_set: Arc<Mutex<Option<T>>>,
 }
 
 impl<T> Receiver<T> {
@@ -62,17 +63,17 @@ impl<T> Receiver<T> {
     }
 }
 
-
 /// The updating-half of the single value channel.
 #[derive(Debug, Clone)]
 pub struct Updater<T> {
-    latest: Weak<Mutex<Option<T>>>
+    latest: Weak<Mutex<Option<T>>>,
 }
 
 /// An error returned from the [`Updater::update`](struct.Updater.html#method.update) function.
 /// Indicates that the paired [`Receiver`](struct.Receiver.html) has been dropped.
 ///
-/// Contains the value that had been passed into [`Updater::update`](struct.Updater.html#method.update)
+/// Contains the value that had been passed into
+/// [`Updater::update`](struct.Updater.html#method.update)
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct NoReceiverError<T>(pub T);
 
@@ -89,7 +90,7 @@ impl<T> Updater<T> {
                 *mutex.lock().unwrap() = Some(value);
                 Ok(())
             }
-            None => Err(NoReceiverError(value))
+            None => Err(NoReceiverError(value)),
         }
     }
 
@@ -104,8 +105,13 @@ impl<T> Updater<T> {
 /// [`Receiver::latest`](struct.Receiver.html#method.latest) will return that value until
 /// a [`Updater::update`](struct.Updater.html#method.update) call replaces the latest value.
 pub fn channel_starting_with<T>(initial: T) -> (Receiver<T>, Updater<T>) {
-    let receiver = Receiver { latest: initial, latest_set: Arc::new(Mutex::new(None)) };
-    let updater = Updater { latest: Arc::downgrade(&receiver.latest_set) };
+    let receiver = Receiver {
+        latest: initial,
+        latest_set: Arc::new(Mutex::new(None)),
+    };
+    let updater = Updater {
+        latest: Arc::downgrade(&receiver.latest_set),
+    };
     (receiver, updater)
 }
 
@@ -123,8 +129,8 @@ pub fn channel<T>() -> (Receiver<Option<T>>, Updater<Option<T>>) {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::{thread, mem};
     use std::sync::Barrier;
+    use std::{mem, thread};
 
     #[test]
     fn send_recv_value() {
@@ -153,7 +159,7 @@ mod test {
         let (mut recv, send) = channel_starting_with(0);
         let (barrier, barrier2) = barrier_pair();
 
-        thread::spawn(move|| {
+        thread::spawn(move || {
             barrier2.wait(); // <- read initial
             for num in 1..1000 {
                 send.update(num).unwrap();
@@ -190,7 +196,7 @@ mod test {
     fn non_blocking_write_during_read() {
         let (mut name_get, name) = channel_starting_with("Nothing".to_owned());
         let (barrier, barrier2) = barrier_pair();
-        thread::spawn(move|| {
+        thread::spawn(move || {
             barrier2.wait(); // <- has read lock
             name.update("Something".to_owned()).unwrap();
             barrier2.wait(); // <- value updated
