@@ -2,6 +2,7 @@
 name = "single_value_channel"
 version = "1.1.0"
 authors = ["Alex Butler <alexheretic@gmail.com>"]
+edition = "2018"
 description = "Concurrent single-value update and receive channel "
 repository = "https://github.com/alexheretic/single-value-channel"
 keywords = ["concurrent", "channel"]
