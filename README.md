@@ -25,3 +25,6 @@ thread::spawn(move|| {
 
 assert_eq!(*receiver.latest(), 12);
 ```
+
+## Minimum supported rust compiler
+This crate is maintained with [latest stable rust](https://gist.github.com/alexheretic/d1e98d8433b602e57f5d0a9637927e0c).
