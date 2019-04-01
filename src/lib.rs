@@ -61,6 +61,11 @@ impl<T> Receiver<T> {
         self.update_latest();
         &mut self.latest
     }
+
+    /// Returns true if the all related `Updater` instances have been dropped.
+    pub fn has_no_updater(&self) -> bool {
+        Arc::weak_count(&self.latest_set) == 0
+    }
 }
 
 /// The updating-half of the single value channel.
@@ -221,11 +226,27 @@ mod test {
     }
 
     #[test]
-    fn is_alive() {
-        let (val_get, val) = channel_starting_with(0);
-        assert!(!val.has_no_receiver());
-        mem::drop(val_get);
-        assert!(val.has_no_receiver());
+    fn updater_has_no_receiver() {
+        let (receiver, updater) = channel_starting_with(0);
+        assert!(!updater.has_no_receiver());
+
+        mem::drop(receiver);
+        assert!(updater.has_no_receiver());
+    }
+
+    #[test]
+    fn receiver_has_no_updater() {
+        let (receiver, updater) = channel_starting_with(0);
+        assert!(!receiver.has_no_updater());
+
+        let updater2 = updater.clone();
+        assert!(!receiver.has_no_updater());
+
+        mem::drop(updater);
+        assert!(!receiver.has_no_updater());
+
+        mem::drop(updater2);
+        assert!(receiver.has_no_updater());
     }
 
     #[test]
