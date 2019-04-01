@@ -1,6 +1,6 @@
 single_value_channel
 [![crates.io](https://img.shields.io/crates/v/single_value_channel.svg)](https://crates.io/crates/single_value_channel)
-[![Documentation](https://docs.rs/single_value_channel/badge.svg)](https://docs.rs/single_value_channel")
+[![Documentation](https://docs.rs/single_value_channel/badge.svg)](https://docs.rs/single_value_channel)
 ================
 
 Non-blocking single value update and receive channel.
