@@ -31,8 +31,11 @@
 //! assert_eq!(*receiver.latest(), 12);
 //! ```
 
-use std::result::Result;
-use std::sync::{Arc, Mutex, Weak};
+use std::{
+    fmt,
+    result::Result,
+    sync::{Arc, Mutex, Weak},
+};
 
 /// The receiving-half of the single value channel.
 #[derive(Debug)]
@@ -79,8 +82,14 @@ pub struct Updater<T> {
 ///
 /// Contains the value that had been passed into
 /// [`Updater::update`](struct.Updater.html#method.update)
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub struct NoReceiverError<T>(pub T);
+
+impl<T> fmt::Debug for NoReceiverError<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "NoReceiverError")
+    }
+}
 
 impl<T> Updater<T> {
     /// Updates the latest value in this channel, to be accessed the next time
@@ -110,13 +119,8 @@ impl<T> Updater<T> {
 /// [`Receiver::latest`](struct.Receiver.html#method.latest) will return that value until
 /// a [`Updater::update`](struct.Updater.html#method.update) call replaces the latest value.
 pub fn channel_starting_with<T>(initial: T) -> (Receiver<T>, Updater<T>) {
-    let receiver = Receiver {
-        latest: initial,
-        latest_set: Arc::new(Mutex::new(None)),
-    };
-    let updater = Updater {
-        latest: Arc::downgrade(&receiver.latest_set),
-    };
+    let receiver = Receiver { latest: initial, latest_set: Arc::new(Mutex::new(None)) };
+    let updater = Updater { latest: Arc::downgrade(&receiver.latest_set) };
     (receiver, updater)
 }
 
@@ -134,8 +138,7 @@ pub fn channel<T>() -> (Receiver<Option<T>>, Updater<Option<T>>) {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::sync::Barrier;
-    use std::{mem, thread};
+    use std::{mem, sync::Barrier, thread};
 
     #[test]
     fn send_recv_value() {
@@ -276,5 +279,13 @@ mod test {
         assert_eq!(*val_get.latest(), None);
         val.update(Some(123)).unwrap();
         assert_eq!(*val_get.latest(), Some(123));
+    }
+
+    #[test]
+    fn unwrap_non_debug() {
+        struct NotDebug(u8);
+
+        let (_val_get, val) = channel_starting_with(NotDebug(0));
+        val.update(NotDebug(3)).expect("This should compile even though `NotDebug` is not Debug");
     }
 }
