@@ -1,13 +1,12 @@
-sudo: false
 language: rust
-rust:
-- stable
-- nightly
-env:
-- RUST_BACKTRACE=full
+rust: stable
+env: RUST_BACKTRACE=full
 matrix:
+  include:
+  - os: linux
+    rust: nightly
 os:
 - linux
 - osx
-script:
-- cargo test
+- windows
+script: cargo test
