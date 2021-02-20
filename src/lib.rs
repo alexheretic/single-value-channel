@@ -269,7 +269,7 @@ mod test {
         assert_eq!(val_get.latest(), "hello");
     }
 
-    #[derive(Eq, PartialEq, Clone, Debug)]
+    #[derive(Eq, PartialEq, Debug)]
     struct Unclonable(u32);
     
     #[test]
