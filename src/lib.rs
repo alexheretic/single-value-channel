@@ -80,7 +80,7 @@ pub struct Updater<T> {
 impl<T> Clone for Updater<T> {
     fn clone(&self) -> Self {
         Updater {
-            latest: Weak::clone(&self.latest)   
+            latest: Weak::clone(&self.latest),
         }
     }
 }
@@ -127,8 +127,13 @@ impl<T> Updater<T> {
 /// [`Receiver::latest`](struct.Receiver.html#method.latest) will return that value until
 /// a [`Updater::update`](struct.Updater.html#method.update) call replaces the latest value.
 pub fn channel_starting_with<T>(initial: T) -> (Receiver<T>, Updater<T>) {
-    let receiver = Receiver { latest: initial, latest_set: Arc::new(Mutex::new(None)) };
-    let updater = Updater { latest: Arc::downgrade(&receiver.latest_set) };
+    let receiver = Receiver {
+        latest: initial,
+        latest_set: Arc::new(Mutex::new(None)),
+    };
+    let updater = Updater {
+        latest: Arc::downgrade(&receiver.latest_set),
+    };
     (receiver, updater)
 }
 
@@ -271,7 +276,7 @@ mod test {
 
     #[derive(Eq, PartialEq, Debug)]
     struct Unclonable(u32);
-    
+
     #[test]
     fn multiple_updaters() {
         let (mut val_get, val1) = channel_starting_with(Unclonable(1));
@@ -297,6 +302,7 @@ mod test {
         struct NotDebug(u8);
 
         let (_val_get, val) = channel_starting_with(NotDebug(0));
-        val.update(NotDebug(3)).expect("This should compile even though `NotDebug` is not Debug");
+        val.update(NotDebug(3))
+            .expect("This should compile even though `NotDebug` is not Debug");
     }
 }
