@@ -99,6 +99,14 @@ impl<T> fmt::Debug for NoReceiverError<T> {
     }
 }
 
+impl<T> fmt::Display for NoReceiverError<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "receiver has been dropped")
+    }
+}
+
+impl<T> std::error::Error for NoReceiverError<T> {}
+
 impl<T> Updater<T> {
     /// Updates the latest value in this channel, to be accessed the next time
     /// [`Receiver::latest`](struct.Receiver.html#method.latest) or

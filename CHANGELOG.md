@@ -1,5 +1,6 @@
 # Unreleased
 * `Updater<T>` now implements `Clone` regardless of `T`.
+* `NoReceiverError<T>` now implements `Display` & `Error`.
 
 # 1.2.1
 * `NoReceiverError<T>` now implements `Debug` regardless of `T`.
