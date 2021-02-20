@@ -72,9 +72,17 @@ impl<T> Receiver<T> {
 }
 
 /// The updating-half of the single value channel.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Updater<T> {
     latest: Weak<Mutex<Option<T>>>,
+}
+
+impl<T> Clone for Updater<T> {
+    fn clone(&self) -> Self {
+        Updater {
+            latest: Weak::clone(&self.latest)   
+        }
+    }
 }
 
 /// An error returned from the [`Updater::update`](struct.Updater.html#method.update) function.
@@ -261,16 +269,19 @@ mod test {
         assert_eq!(val_get.latest(), "hello");
     }
 
+    #[derive(Eq, PartialEq, Debug)]
+    struct Unclonable(u32);
+    
     #[test]
     fn multiple_updaters() {
-        let (mut val_get, val1) = channel_starting_with(0);
+        let (mut val_get, val1) = channel_starting_with(Unclonable(1));
         let val2 = val1.clone();
 
-        val1.update(2).unwrap();
-        assert_eq!(*val_get.latest(), 2);
+        val1.update(Unclonable(2)).unwrap();
+        assert_eq!(*val_get.latest(), Unclonable(2));
 
-        val2.update(3).unwrap();
-        assert_eq!(*val_get.latest(), 3);
+        val2.update(Unclonable(3)).unwrap();
+        assert_eq!(*val_get.latest(), Unclonable(3));
     }
 
     #[test]
