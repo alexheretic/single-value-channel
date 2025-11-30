@@ -309,8 +309,10 @@ mod test {
     fn unwrap_non_debug() {
         struct NotDebug(u8);
 
-        let (_val_get, val) = channel_starting_with(NotDebug(0));
+        let (mut rx, val) = channel_starting_with(NotDebug(0));
         val.update(NotDebug(3))
             .expect("This should compile even though `NotDebug` is not Debug");
+
+        assert_eq!(rx.latest().0, 3);
     }
 }
