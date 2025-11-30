@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: rustup update stable
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - run: cargo test
 
   check_wasm:
@@ -19,12 +19,12 @@ jobs:
     steps:
     - run: rustup update stable
     - run: rustup target add wasm32-unknown-unknown
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - run: cargo check --target wasm32-unknown-unknown
 
   rustfmt:
     runs-on: ubuntu-latest
     steps:
     - run: rustup update stable
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - run: cargo fmt -- --check
